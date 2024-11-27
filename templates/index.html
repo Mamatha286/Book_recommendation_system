@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .container {
+            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 50px auto;
+            color: #333;
+        }
+    
+        h1.text-center {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            color: #ff758c;
+        }
+    
+        label.form-label {
+            font-weight: bold;
+            color: #555;
+        }
+    
+        .form-control {
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+    
+        .btn-primary {
+            background-color: #ff758c;
+            border-color: #ff758c;
+            font-weight: bold;
+        }
+    
+        .btn-primary:hover {
+            background-color: #ff5a75;
+            border-color: #ff5a75;
+        }
+    
+        #recommendations {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        h4 {
+            color: #ff758c;
+            font-weight: bold;
+        }
+    
+        .list-group-item {
+            border: none;
+            padding: 10px 15px;
+            margin: 5px 0;
+            background-color: #ff7eb3;
+            color: #fff;
+            border-radius: 5px;
+        }
+    
+        .alert-danger {
+            color: #fff;
+            background-color: #ff5a75;
+            border-color: #ff758c;
+            border-radius: 5px;
+        }
+    </style>
+</head>    
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Book Recommendation System</h1>
+        <form id="book-form" class="mt-4">
+            <div class="mb-3">
+                <label for="book_title" class="form-label">Enter a Book Title</label>
+                <input type="text" id="book_title" name="book_title" class="form-control" placeholder="Type a book title" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Get Recommendations</button>
+        </form>
+        <div id="recommendations" class="mt-4"></div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#book-form").on("submit", function (e) {
+                e.preventDefault();
+                const bookTitle = $("#book_title").val();
+
+                $.ajax({
+                    url: "/recommend",
+                    type: "POST",
+                    data: { book_title: bookTitle },
+                    success: function (response) {
+                        const container = $("#recommendations");
+                        container.empty();
+
+                        if (response.error) {
+                            container.append(`<div class="alert alert-danger">${response.error}</div>`);
+                        } else {
+                            container.append(`<h4>Recommended Books:</h4><ul class="list-group"></ul>`);
+                            response.recommendations.forEach(book => {
+                                container.find("ul").append(`<li class="list-group-item">${book}</li>`);
+                            });
+                        }
+                    },
+                    error: function () {
+                        $("#recommendations").html('<div class="alert alert-danger">An error occurred. Please try again later.</div>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
